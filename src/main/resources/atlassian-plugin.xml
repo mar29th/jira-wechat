@@ -1,0 +1,43 @@
+<atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}" />
+        <param name="plugin-icon">images/pluginIcon.png</param>
+        <param name="plugin-logo">images/pluginLogo.png</param>
+        <param name="configure.url">/admin/plugins/jira-wechat/configure</param>
+    </plugin-info>
+
+    <!-- add our i18n resource -->
+    <resource type="i18n" name="i18n" location="jira-wechat"/>
+    
+    <!-- add our web resources -->
+    <web-resource key="jira-wechat-resources" name="jira-wechat Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        
+        <resource type="download" name="jira-wechat.css" location="/css/jira-wechat.css"/>
+        <resource type="download" name="jira-wechat.js" location="/js/jira-wechat.js"/>
+        <resource type="download" name="images/" location="/images"/>
+        <resource type="download" name="config-serv.js" location="/js/config-serv.js"/>
+
+        <context>jira-wechat</context>
+    </web-resource>
+    
+    <!-- import from the product container -->
+    <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties" />
+    <component-import key="eventPublisher" interface="com.atlassian.event.api.EventPublisher"/>
+    <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" />
+    <component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider" />
+    <component-import key="renderer" interface="com.atlassian.templaterenderer.velocity.one.six.VelocityTemplateRenderer" />
+
+    <!-- include event listener component -->
+    <component key="eventListener" class="com.takefive.plugins.jira.wechat.IssueChangedListener">
+        <description>Class that listens issue creation, update and completion.</description>
+    </component>
+
+    <!-- Config servlet -->
+    <servlet key="configuration-servlet" class="com.takefive.plugins.jira.wechat.ConfigurationServlet">
+        <url-pattern>/admin/plugins/jira-wechat/configure</url-pattern>
+    </servlet>
+    
+</atlassian-plugin>
