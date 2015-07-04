@@ -8,48 +8,86 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
- * Created by lafickens on 7/3/15.
+ * Handles active WeChat connection requests (eg. sending messages).
+ * 
+ * @author lafickens
+ *
  */
 public class WeChatActiveConnection {
 
   private AsyncHttpClient client;
   private PluginSettings pluginSettings;
+  
+  private String corpId;
+  private String corpSecret;
+  
+  private static String accessToken = null;
+  private static Calendar expiresAt = null;
 
   public WeChatActiveConnection(PluginSettingsFactory pluginSettingsFactory) {
-    this.client = new AsyncHttpClient();
-    this.pluginSettings = pluginSettingsFactory.createGlobalSettings();
+    client = new AsyncHttpClient();
+    pluginSettings = pluginSettingsFactory.createGlobalSettings();
+    corpId = (String) pluginSettings.get("wechat-corpId");
+    corpSecret = (String) pluginSettings.get("wechat-corpSecret");
   }
 
   public String getAuthenticationURL(String corpId, String corpSecret) {
     return String.format("https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corpsecret=%s", corpId, corpSecret);
   }
+  
+  public String getSendMessageURL(String accessToken) {
+    return String.format("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=%s", accessToken);
+  }
 
-  public String getAccessToken() {
-    String corpId = (String) pluginSettings.get("wechat-corpId");
-    String corpSecret = (String) pluginSettings.get("wechat-corpSecret");
+  public String getAccessToken() throws ConnectionException {
+    // Check if token exists already and is within expiration.
+    if (accessToken != null && expiresAt.after(Calendar.getInstance())) {
+      return accessToken;
+    }
+    
+    // If token doesn't exist or has already expired, request a new one.
     Future<Response> f = client.prepareGet(getAuthenticationURL(corpId, corpSecret)).execute();
     try {
       Response r = f.get();
       JSONObject tokenJson = new JSONObject(r.getResponseBody());
-      String token = tokenJson.getString("access_token");
-      int expiresAfter = tokenJson.getInt("expires_in");
-      pluginSettings.put("wechat-access-token", token);
-      pluginSettings.put("wechat-access-token-expires-at", System.currentTimeMillis() / 1000 + expiresAfter);
-      return token;
+      if (tokenJson.has("errcode")) {
+        throw new ConnectionException("Access token: WeChat server returns error code: " + tokenJson.getInt("errcode"));
+      }
+      accessToken = tokenJson.getString("access_token");
+      expiresAt = Calendar.getInstance();
+      expiresAt.add(Calendar.SECOND, tokenJson.getInt("expires_in"));
+      return accessToken;
     } catch (InterruptedException | ExecutionException | IOException e) {
       e.printStackTrace();
-      throw new RuntimeException("Connection failure");
+      throw new ConnectionException("Connection failure");
     } catch (JSONException e) {
       e.printStackTrace();
-      throw new RuntimeException("Corrupt data");
+      throw new ConnectionException("Corrupt data");
     }
   }
   
-  public void send(String message) {
-    
+  public void sendMessage(String message) throws ConnectionException {
+    String token = getAccessToken();
+    String url = getSendMessageURL(token);
+    Future<Response> f = client.preparePost(url).execute();
+    try {
+      Response r = f.get();
+      JSONObject responseJson = new JSONObject(r.getResponseBody());
+      if (responseJson.getInt("errcode") != 0) {
+        throw new ConnectionException("Send message: WeChat server returns error code: " + responseJson.getInt("errorcode"));
+      }
+    } catch (InterruptedException | ExecutionException | IOException e) {
+      e.printStackTrace();
+      throw new ConnectionException("Connection failure");
+    } catch (JSONException e) {
+      e.printStackTrace();
+      throw new ConnectionException("Corrupt data");
+    }
   }
 }

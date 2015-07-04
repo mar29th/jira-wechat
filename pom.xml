@@ -68,9 +68,9 @@
             <version>2.2.2-atlassian-1</version>
         </dependency>
         <dependency>
-		<groupId>org.json</groupId>
-		    <artifactId>json</artifactId>
-		    <version>20141113</version>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20141113</version>
 		</dependency>
 
         <!-- AsyncHttpClient for WeChat connection -->
