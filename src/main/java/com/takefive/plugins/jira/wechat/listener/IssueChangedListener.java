@@ -1,4 +1,4 @@
-package com.takefive.plugins.jira.wechat;
+package com.takefive.plugins.jira.wechat.listener;
 
 import com.atlassian.event.api.EventListener;
 import com.atlassian.event.api.EventPublisher;

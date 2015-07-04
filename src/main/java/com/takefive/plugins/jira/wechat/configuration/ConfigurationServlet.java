@@ -1,8 +1,9 @@
-package com.takefive.plugins.jira.wechat;
+package com.takefive.plugins.jira.wechat.configuration;
 
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.sal.api.user.UserProfile;
+import com.atlassian.templaterenderer.TemplateRenderer;
 
 import java.io.IOException;
 import java.net.URI;

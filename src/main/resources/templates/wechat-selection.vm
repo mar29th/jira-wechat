@@ -1,5 +1,0 @@
-#controlHeader ($action $customField.id $customField.name $fieldLayoutItem.required $displayParameters.noHeader)
-
-
-
-#controlFooter ($action $fieldLayoutItem.fieldDescription $displayParameters.noHeader)

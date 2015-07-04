@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>JIRA WeChat Connector</title>
+        <title>$i18n.getText("jira-wechat.configuration.label")</title>
         <meta name="decorator" content="atl.admin">
         $webResourceManager.requireResource("com.takefive.plugins.jira.wechat:resources:jira-wechat-resources")
     </head>
