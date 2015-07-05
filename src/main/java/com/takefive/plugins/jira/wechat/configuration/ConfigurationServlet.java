@@ -17,39 +17,44 @@ import javax.servlet.http.HttpServletResponse;
  * Created by lafickens on 7/3/15.
  */
 public class ConfigurationServlet extends HttpServlet {
-    private final UserManager userManager;
-    private final LoginUriProvider loginUriProvider;
-    private final TemplateRenderer renderer;
+  
+  /**
+   * Default serial version ID
+   */
+  private static final long serialVersionUID = 1L;
+  private final UserManager userManager;
+  private final LoginUriProvider loginUriProvider;
+  private final TemplateRenderer renderer;
 
-    public ConfigurationServlet(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer renderer) {
-        this.userManager = userManager;
-        this.loginUriProvider = loginUriProvider;
-        this.renderer = renderer;
+  public ConfigurationServlet(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer renderer) {
+    this.userManager = userManager;
+    this.loginUriProvider = loginUriProvider;
+    this.renderer = renderer;
+  }
+
+  public void doGet(HttpServletRequest request, HttpServletResponse response) 
+      throws IOException, ServletException {
+    UserProfile user = userManager.getRemoteUser(request);
+    if (user.getUsername() == null || !userManager.isSystemAdmin(user.getUserKey())) {
+      redirectToLogin(request, response);
+      return;
     }
+    response.setContentType("text/html;charset=utf-8");
+    renderer.render("templates/admin.vm", response.getWriter());
+  }
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
-        UserProfile user = userManager.getRemoteUser(request);
-        if (user.getUsername() == null || !userManager.isSystemAdmin(user.getUserKey())) {
-            redirectToLogin(request, response);
-            return;
-        }
-        response.setContentType("text/html;charset=utf-8");
-        renderer.render("templates/admin.vm", response.getWriter());
-    }
+  private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    response.sendRedirect(loginUriProvider.getLoginUri(getUri(request)).toASCIIString());
+  }
 
-    private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.sendRedirect(loginUriProvider.getLoginUri(getUri(request)).toASCIIString());
-    }
-
-    private URI getUri(HttpServletRequest request)
+  private URI getUri(HttpServletRequest request)
+  {
+    StringBuffer builder = request.getRequestURL();
+    if (request.getQueryString() != null)
     {
-        StringBuffer builder = request.getRequestURL();
-        if (request.getQueryString() != null)
-        {
-            builder.append("?");
-            builder.append(request.getQueryString());
-        }
-        return URI.create(builder.toString());
+      builder.append("?");
+      builder.append(request.getQueryString());
     }
+    return URI.create(builder.toString());
+  }
 }

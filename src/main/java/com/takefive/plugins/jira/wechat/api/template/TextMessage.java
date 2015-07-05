@@ -10,8 +10,14 @@ public class TextMessage extends AbstractMessage {
   
   private String content;
   
-  public JSONObject toJson() {
-    JSONObject retval = super.toJson();
+  public TextMessage() {
+    super();
+    setMsgType("text");
+  }
+  
+  @Override
+  protected JSONObject toJsonObject() {
+    JSONObject retval = super.toJsonObject();
     Map<String, String> textMap = new HashMap<String, String>();
     textMap.put("content", content);
     try {
@@ -21,5 +27,10 @@ public class TextMessage extends AbstractMessage {
       e.printStackTrace();
     }
     return retval;
+  }
+  
+  @Override
+  public String toJson() {
+    return toJsonObject().toString();
   }
 }

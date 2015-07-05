@@ -5,7 +5,7 @@
         <vendor name="${project.organization.name}" url="${project.organization.url}" />
         <param name="plugin-icon">images/pluginIcon.png</param>
         <param name="plugin-logo">images/pluginLogo.png</param>
-        <param name="configure.url">/jira-wechat/configure</param>
+        <param name="configure.url">/plugins/servlet/jira-wechat/configure</param>
     </plugin-info>
 
     <!-- add our i18n resource -->
@@ -16,18 +16,17 @@
         <dependency>com.atlassian.auiplugin:ajs</dependency>
         <resource type="download" name="images/" location="/images"/>
         <resource type="download" name="config-serv.js" location="/js/config-serv.js"/>
-
         <context>jira-wechat</context>
     </web-resource>
     
     <!-- import from the product container -->
-    <component-import key="applicationProperties" interface="com.atlassian.sal.api.ApplicationProperties" />
     <component-import key="eventPublisher" interface="com.atlassian.event.api.EventPublisher"/>
     <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" />
     <component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider" />
     <component-import key="renderer" interface="com.atlassian.templaterenderer.velocity.one.six.VelocityTemplateRenderer" />
     <component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" />
     <component-import key="transactionTemplate" interface="com.atlassian.sal.api.transaction.TransactionTemplate" />
+    <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver"/>
 
     <!-- include event listener component -->
     <component key="eventListener" class="com.takefive.plugins.jira.wechat.listener.IssueChangedListener">
@@ -35,7 +34,7 @@
     </component>
 
     <!-- Config servlet -->
-    <servlet key="configuration-servlet" class="com.takefive.plugins.jira.wechat.configuration.ConfigurationServlet">
+    <servlet key="admin-servlet" class="com.takefive.plugins.jira.wechat.configuration.ConfigurationServlet">
         <url-pattern>/jira-wechat/configure</url-pattern>
     </servlet>
 
@@ -45,10 +44,12 @@
     </rest>
 
     <!-- Add web menu item -->
+    <!--
     <web-item key="jira-menu-item" name="JIRA-WeChat Admin" section="system.admin/globalsettings" weight="10" application="jira">
         <description>Link to JIRA-WeChat configuration page.</description>
         <label key="jira-wechat.configuration.label" />
         <link linkId="jira-wechat-configuration-link">/plugins/servlet/jira-wechat/configure</link>
     </web-item>
+    -->
     
 </atlassian-plugin>

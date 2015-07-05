@@ -6,6 +6,7 @@ import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
+import com.takefive.plugins.jira.wechat.utils.DateUtils;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -28,7 +29,7 @@ public class WeChatActiveConnection {
   private String corpSecret;
   
   private static String accessToken = null;
-  private static Calendar expiresAt = null;
+  private static Date expiresAt = null;
 
   public WeChatActiveConnection(PluginSettingsFactory pluginSettingsFactory) {
     client = new AsyncHttpClient();
@@ -47,7 +48,7 @@ public class WeChatActiveConnection {
 
   public String getAccessToken() throws ConnectionException {
     // Check if token exists already and is within expiration.
-    if (accessToken != null && expiresAt.after(Calendar.getInstance())) {
+    if (accessToken != null && expiresAt.after(new Date())) {
       return accessToken;
     }
     
@@ -57,11 +58,10 @@ public class WeChatActiveConnection {
       Response r = f.get();
       JSONObject tokenJson = new JSONObject(r.getResponseBody());
       if (tokenJson.has("errcode")) {
-        throw new ConnectionException("Access token: WeChat server returns error code: " + tokenJson.getInt("errcode"));
+        throw new ConnectionException("(Access token) WeChat server returns error code: " + tokenJson.getInt("errcode"));
       }
       accessToken = tokenJson.getString("access_token");
-      expiresAt = Calendar.getInstance();
-      expiresAt.add(Calendar.SECOND, tokenJson.getInt("expires_in"));
+      expiresAt = DateUtils.after(tokenJson.getInt("expires_in")).seconds();
       return accessToken;
     } catch (InterruptedException | ExecutionException | IOException e) {
       e.printStackTrace();
@@ -80,7 +80,7 @@ public class WeChatActiveConnection {
       Response r = f.get();
       JSONObject responseJson = new JSONObject(r.getResponseBody());
       if (responseJson.getInt("errcode") != 0) {
-        throw new ConnectionException("Send message: WeChat server returns error code: " + responseJson.getInt("errorcode"));
+        throw new ConnectionException("(Send message) WeChat server returns error code: " + responseJson.getInt("errorcode"));
       }
     } catch (InterruptedException | ExecutionException | IOException e) {
       e.printStackTrace();

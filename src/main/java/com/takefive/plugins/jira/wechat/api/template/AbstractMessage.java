@@ -14,6 +14,7 @@ public abstract class AbstractMessage {
   private ArrayList<String> toUser;
   private ArrayList<String> toParty;
   private ArrayList<String> toTag;
+
   private String msgType;
   private int agentId;
   private int safe;
@@ -51,6 +52,22 @@ public abstract class AbstractMessage {
     toTag.remove(tagId);
   }
   
+  public String getMsgType() {
+    return msgType;
+  }
+
+  public int getAgentId() {
+    return agentId;
+  }
+
+  public int getSafe() {
+    return safe;
+  }
+  
+  public void setMsgType(String type) {
+    msgType = type;
+  }
+  
   public void setAgentId(int id) {
     agentId = id;
   }
@@ -62,7 +79,7 @@ public abstract class AbstractMessage {
       safe = 0;
   }
   
-  public JSONObject toJson() {
+  protected JSONObject toJsonObject() {
     String toUserStr = StringUtils.join(toUser, DELIMITER);
     String toPartyStr = StringUtils.join(toParty, DELIMITER);
     String toTagStr = StringUtils.join(toTag, DELIMITER);
@@ -79,5 +96,9 @@ public abstract class AbstractMessage {
       e.printStackTrace();
       return null;
     }
+  }
+  
+  public String toJson() {
+    return toJsonObject().toString();
   }
 }

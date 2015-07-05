@@ -14,8 +14,8 @@
         <url>http://www.takefiveinteractive.com/</url>
     </organization>
 
-    <name>jira-wechat</name>
-    <description>This is the com.takefive.plugins.jira:jira-wechat plugin for Atlassian JIRA.</description>
+    <name>JIRA WeChat Connector</name>
+    <description>JIRA bridging with WeChat</description>
     <packaging>atlassian-plugin</packaging>
 
     <dependencies>
@@ -25,12 +25,14 @@
             <version>${jira.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!--
         <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-core</artifactId>
             <version>${jira.version}</version>
             <scope>provided</scope>
         </dependency>
+        -->
 		<dependency>
 		  <groupId>com.atlassian.templaterenderer</groupId>
 		  <artifactId>atlassian-template-renderer-api</artifactId>
@@ -86,6 +88,13 @@
 			<artifactId>commons-codec</artifactId>
 			<version>1.9</version>
 		</dependency>
+		
+		<!-- Spring framework context -->
+		<dependency>
+    		<groupId>org.springframework</groupId>
+    		<artifactId>spring-context</artifactId>
+    		<version>4.1.7.RELEASE</version>
+		</dependency>
 
 		<!-- Uncomment to use TestKit in your project. Details at https://bitbucket.org/atlassian/jira-testkit -->
 		<!-- You can read more about TestKit at https://developer.atlassian.com/display/JIRADEV/Plugin+Tutorial+-+Smarter+integration+testing+with+TestKit -->
@@ -124,14 +133,15 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 
     <properties>
+    	<jdkLevel>1.8</jdkLevel>
         <jira.version>6.4.7</jira.version>
         <amps.version>5.0.13</amps.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
