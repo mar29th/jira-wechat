@@ -5,6 +5,7 @@ import com.atlassian.jira.util.json.JSONObject;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
 import com.ning.http.client.Response;
 import com.takefive.plugins.jira.wechat.api.template.Department;
 import com.takefive.plugins.jira.wechat.api.template.Member;
@@ -42,25 +43,28 @@ public class WeChatActiveConnection {
     corpId = (String) pluginSettings.get("jira-wechat.corpId");
     corpSecret = (String) pluginSettings.get("jira-wechat.corpSecret");
   }
-
-  private String getAuthenticationURL(String corpId, String corpSecret) {
-    return String.format("https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corpsecret=%s", corpId, corpSecret);
-  }
   
-  private String getSendMessageURL(String accessToken) {
-    return String.format("https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=%s", accessToken);
-  }
-  
-  private String getAddOrUpdateMemberURL(String accessToken) {
-    return String.format("https://qyapi.weixin.qq.com/cgi-bin/user/create?access_token=%s", accessToken);
-  }
-  
-  private String getAddOrUpdateDepartmentURL(String accessToken) {
-    return String.format("https://qyapi.weixin.qq.com/cgi-bin/department/create?access_token=%s", accessToken);
-  }
-  
-  private JSONObject send(String url, String message) throws ConnectionException {
-    Future<Response> f = client.preparePost(url).execute();
+  private JSONObject send(String url, String method, String message) throws ConnectionException {
+    BoundRequestBuilder b;
+    if (method == HttpMethods.GET)
+      b = client.prepareGet(url);
+    else if (method == HttpMethods.POST)
+      b = client.preparePost(url);
+    else if (method == HttpMethods.PUT)
+      b = client.preparePut(url);
+    else if (method == HttpMethods.DELETE)
+      b = client.prepareDelete(url);
+    else
+      // Wrong method type
+      throw new ConnectionException("Wrong method type");
+    
+    // Set body if any
+    if (message != null)
+      b.setBody(message);
+    
+    Future<Response> f = b.execute();
+    
+    // Try connect
     try {
       Response r = f.get();
       JSONObject responseJson = new JSONObject(r.getResponseBody());
@@ -94,12 +98,12 @@ public class WeChatActiveConnection {
     }
     
     // If token doesn't exist or has already expired, request a new one.
-    Future<Response> f = client.prepareGet(getAuthenticationURL(corpId, corpSecret)).execute();
+    Future<Response> f = client.prepareGet(URLHelper.getAuthenticationURL(corpId, corpSecret)).execute();
     try {
       Response r = f.get();
       JSONObject tokenJson = new JSONObject(r.getResponseBody());
       if (tokenJson.has("errcode")) {
-        throw new ConnectionException("(Access token) WeChat server returns error code: " + tokenJson.getInt("errcode"));
+        throw new ConnectionException("WeChat server returns error code: " + tokenJson.getInt("errcode"));
       }
       String accessToken = tokenJson.getString("access_token");
       int expiresAt = tokenJson.getInt("expires_in");
@@ -125,23 +129,54 @@ public class WeChatActiveConnection {
     logger.debug("Sending message");
     
     String token = getAccessToken();
-    String url = getSendMessageURL(token);
-    send(url, message.toJson());
+    String url = URLHelper.getSendMessageURL(token);
+    send(url, HttpMethods.POST, message.toJson());
   }
   
-  public void addOrUpdateMember(Member member) throws ConnectionException {
+  public void addMember(Member member) throws ConnectionException {
     logger.debug("Adding or updating member");
     
     String token = getAccessToken();
-    String url = getAddOrUpdateMemberURL(token);
-    send(url, member.toJson());
+    String url = URLHelper.getAddMemberURL(token);
+    send(url, HttpMethods.POST, member.toJson());
   }
   
-  public void addOrUpdateDepartment(Department department) throws ConnectionException {
+  public void updateMember(Member member) throws ConnectionException {
+    logger.debug("Adding or updating member");
+    
+    String token = getAccessToken();
+    String url = URLHelper.getUpdateMemberURL(token);
+    send(url, HttpMethods.POST, member.toJson());
+  }
+  
+  public void deleteMember(Member member) throws ConnectionException {
+    logger.debug("Deleting member");
+    
+    String token = getAccessToken();
+    String url = URLHelper.getDeleteMemberURL(token, member.getUserId());
+    send(url, HttpMethods.GET, null);
+  }
+  
+  public void inviteFollow(Member member) throws ConnectionException {
+    logger.debug("Inviting member to follow");
+    
+    String token = getAccessToken();
+    String url = URLHelper.getInviteFollowURL(token);
+    try {
+      String json = new JSONObject().append("userid", member.getUserId()).toString();
+      send(url, HttpMethods.POST, json);
+    } catch (JSONException e) {
+      // Should not happen
+      e.printStackTrace();
+      throw new ConnectionException("What?!");
+    }
+  }
+  
+  public void addDepartment(Department department) throws ConnectionException {
     logger.debug("Adding or updating department");
     
     String token = getAccessToken();
-    String url = getAddOrUpdateDepartmentURL(token);
-    send(url, department.toJson());
+    String url = URLHelper.getAddDepartmentURL(token);
+    send(url, HttpMethods.POST, department.toJson());
   }
 }

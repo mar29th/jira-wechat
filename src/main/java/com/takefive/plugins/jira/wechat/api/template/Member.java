@@ -10,17 +10,18 @@ public class Member {
   private String mobile;
   private int gender;
   private int enable;
+  private int status;
   private String email;
   private String weixinid;
   private String avatar_mediaid;
   
   public Member() {}
   
-  public String getUserid() {
+  public String getUserId() {
     return userid;
   }
   
-  public void setUserid(String userid) {
+  public void setUserId(String userid) {
     this.userid = userid;
   }
   
@@ -70,6 +71,10 @@ public class Member {
   
   public void setEnable(int enable) {
     this.enable = enable;
+  }
+  
+  public int getStatus() {
+    return status;
   }
   
   public String getEmail() {
