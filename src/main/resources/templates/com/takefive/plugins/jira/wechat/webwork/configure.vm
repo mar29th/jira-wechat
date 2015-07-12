@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title>$action.getText("jira-wechat.configuration.label")</title>
+        <meta name="decorator" content="atl.admin">
+    </head>
+    <body>
+        <form id="configSecret" class="aui" method="post" action="${baseurl}/secure/admin/ConfigureWeChatAccess.jspa">
+            <div class="field-group">
+                <label for="corpId">CorpId</label>
+                <input type="text" class="text medium-field" id="corpId" name="$action.getCorpId()">
+                <div class="description">WeChat CorpId obtained from <a href="http://qy.weixin.qq.com">WeChat Enterprise Account Management Console</a></div>
+            </div>
+            <div class="field-group">
+                <label for="corpSecret">CorpSecret</label>
+                <input type="text" class="text medium-field" id="corpSecert" name="$action.getCorpSecret()">
+                <div class="description">WeChat CorpSecret obtained from <a href="http://qy.weixin.qq.com">WeChat Enterprise Account Management Console</a></div>
+            </div>
+            <div class="buttons-container">
+            	<div class="buttons">
+                	<input type="submit" value="Save">
+            	</div>
+            </div>
+        </form>
+    </body>
+</html>

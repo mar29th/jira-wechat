@@ -9,6 +9,7 @@ public class Member {
   private String position;
   private String mobile;
   private int gender;
+  private int enable;
   private String email;
   private String weixinid;
   private String avatar_mediaid;
@@ -61,6 +62,14 @@ public class Member {
   
   public void setGender(int gender) {
     this.gender = gender;
+  }
+  
+  public int getEnable() {
+    return enable;
+  }
+  
+  public void setEnable(int enable) {
+    this.enable = enable;
   }
   
   public String getEmail() {

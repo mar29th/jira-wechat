@@ -1,55 +1,66 @@
 <atlassian-plugin key="${project.groupId}.${project.artifactId}" name="${project.name}" plugins-version="2">
+	
+	<!-- Plugin information -->
     <plugin-info>
         <description>${project.description}</description>
         <version>${project.version}</version>
         <vendor name="${project.organization.name}" url="${project.organization.url}" />
         <param name="plugin-icon">images/pluginIcon.png</param>
         <param name="plugin-logo">images/pluginLogo.png</param>
-        <param name="configure.url">/plugins/servlet/jira-wechat/configure</param>
     </plugin-info>
 
-    <!-- add our i18n resource -->
+    <!-- I18n -->
     <resource type="i18n" name="i18n" location="i18n.properties"/>
     
-    <!-- add our web resources -->
-    <web-resource key="jira-wechat-resources" name="jira-wechat Web Resources">
+    <!-- Web resources -->
+    <web-resource key="jira-wechat-connector-resources" name="jira-wechat-connector Web Resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
+        
+        <resource type="download" name="jira-wechat-connector.css" location="/css/jira-wechat-connector.css"/>
+        <resource type="download" name="jira-wechat-connector.js" location="/js/jira-wechat-connector.js"/>
         <resource type="download" name="images/" location="/images"/>
-        <resource type="download" name="config-serv.js" location="/js/config-serv.js"/>
-        <context>jira-wechat</context>
+
+        <context>jira-wechat-connector</context>
+        <context>atl.general</context>
+        <context>atl.admin</context>
     </web-resource>
     
-    <!-- import from the product container -->
-    <component-import key="eventPublisher" interface="com.atlassian.event.api.EventPublisher"/>
-    <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager" />
-    <component-import key="loginUriProvider" interface="com.atlassian.sal.api.auth.LoginUriProvider" />
-    <component-import key="renderer" interface="com.atlassian.templaterenderer.velocity.one.six.VelocityTemplateRenderer" />
-    <component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory" />
-    <component-import key="transactionTemplate" interface="com.atlassian.sal.api.transaction.TransactionTemplate" />
-    <component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver"/>
-
-    <!-- include event listener component -->
-    <component key="eventListener" class="com.takefive.plugins.jira.wechat.listener.IssueChangedListener">
-        <description>Class that listens issue creation, update and completion.</description>
-    </component>
-
-    <!-- Config servlet -->
-    <servlet key="admin-servlet" class="com.takefive.plugins.jira.wechat.configuration.ConfigurationServlet">
-        <url-pattern>/jira-wechat/configure</url-pattern>
-    </servlet>
-
-    <!-- REST API -->
-    <rest key="rest" path="/jira-wechat" version="1.0">
-        <description>Provides REST resources for the admin UI.</description>
-    </rest>
-
-    <!-- Add web menu item -->
-    <!--
-    <web-item key="jira-menu-item" name="JIRA-WeChat Admin" section="system.admin/globalsettings" weight="10" application="jira">
-        <description>Link to JIRA-WeChat configuration page.</description>
-        <label key="jira-wechat.configuration.label" />
-        <link linkId="jira-wechat-configuration-link">/plugins/servlet/jira-wechat/configure</link>
-    </web-item>
-    -->
+    <!-- Webworks -->
+    <webwork1 key="connectorConfiguration" name="WeChat Connector Configuration" class="java.lang.Object">
+    	<actions>
+    		<action name="com.takefive.plugins.jira.wechat.webwork.ConfigureWeChatAccess" alias="ConfigureWeChatAccess" roles-required="admin">
+    			<view name="success">/templates/com/takefive/plugins/jira/wechat/webwork/configure.vm</view>
+    		</action>
+    	</actions>
+    </webwork1>
     
+    <!-- Components -->
+    <component key="issueCreatedUpdatedListener" class="com.takefive.plugins.jira.wechat.listener.IssueCreatedUpdatedListener">
+    	<description>Process issue events and send messages to WeChat account</description>
+    </component>
+    
+    <!-- Component imports -->
+  	<component-import key="eventPublisher" interface="com.atlassian.event.api.EventPublisher"/>
+  	<component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager"/>
+  	<component-import key="pluginSettingsFactory" interface="com.atlassian.sal.api.pluginsettings.PluginSettingsFactory"/>
+  	<component-import key="i18nResolver" interface="com.atlassian.sal.api.message.I18nResolver"/>
+  	
+  	<!-- Configuration web section -->
+  	<web-section key="jira-wechat" name="JIRA Wechat Configuration" location="system.admin" weight="100">
+  		<description key="section.jira-wechat.config.desc">Configuration for JIRA WeChat Connector</description>
+  		<label>jira-wechat</label>
+  		<name>jira-wechat web section name</name>
+  	</web-section>
+  	
+  	<!-- Configuration web item -->
+  	<web-item key="jira-wechat-setid" name="WeChat Access Information" section="system.admin/jira-wechat" weight="10">
+  		<description>Set WeChat Enterprise Account Access Information</description>
+  		<label>Set WeChat Enterprise Account Access Information</label>
+  		<name>JIRA WeChat Name Item</name>
+  		<link>/secure/admin/ConfigureWeChatAccess!default.jspa</link>
+  		<condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
+  			<param name="permission">admin</param>
+        </condition>
+  	</web-item>
+  	
 </atlassian-plugin>
