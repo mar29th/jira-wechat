@@ -11,6 +11,7 @@ import com.atlassian.jira.event.issue.IssueEvent;
 import com.atlassian.jira.event.type.EventType;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
+import com.atlassian.sal.api.user.UserManager;
 import com.takefive.plugins.jira.wechat.api.WeChatActiveConnection;
 
 public class IssueCreatedUpdatedListener implements InitializingBean, DisposableBean {
@@ -19,15 +20,15 @@ public class IssueCreatedUpdatedListener implements InitializingBean, Disposable
   
   private final EventPublisher eventPublisher;
   private final PluginSettingsFactory pluginSettingsFactory;
-  private final I18nResolver i18nResolver;
+  private final UserManager userManager;
   
-  private WeChatActiveConnection connection;
+  private WeChatActiveConnection activeConnection;
   
-  public IssueCreatedUpdatedListener(EventPublisher eventPublisher, PluginSettingsFactory pluginSettingsFactory, I18nResolver i18nResolver) {
+  public IssueCreatedUpdatedListener(EventPublisher eventPublisher, PluginSettingsFactory pluginSettingsFactory, UserManager userManager) {
     this.eventPublisher = eventPublisher;
     this.pluginSettingsFactory = pluginSettingsFactory;
-    this.i18nResolver = i18nResolver;
-    connection = new WeChatActiveConnection(this.pluginSettingsFactory);
+    this.userManager = userManager;
+    activeConnection = new WeChatActiveConnection(this.pluginSettingsFactory);
   }
   
   @EventListener
@@ -53,6 +54,7 @@ public class IssueCreatedUpdatedListener implements InitializingBean, Disposable
   
   private void onIssueCreated(IssueEvent event) {
     logger.debug("Issue created");
+    
   }
   
   private void onIssueUpdated(IssueEvent event) {

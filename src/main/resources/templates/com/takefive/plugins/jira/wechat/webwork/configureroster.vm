@@ -1,0 +1,56 @@
+<html>
+	<head>
+		<title>$action.getText("jira-wechat.personal.configuration.roster.label")</title>
+		$webResourceManager.requireResourcesForContext("jira-wechat-connector")
+		<script type="text/javascript">
+			AJS.$("#searchForm").submit(function (e) {
+				e.preventDefault();
+				jQuery.ajax({
+					url: "/rest/wechataccountinfo/1.0/roster",
+					method: "post",
+					data: jQuery("#searchForm").serialize(),
+					success: function (data) {
+						jQuery("#roster-table > tbody").empty();
+						var row = jQuery("<tr></tr>");
+						if (data.userId && data.userId !== "")
+							row.append('<td headers="username-header"><input type="text" id="username-textbox" value="' + data.username + '" /></td><td headers="weChatId-header"><input type="text" id="weChatId-textbox" value="' + data.weChatId + '" /></td><td headers="userId-header"><input type="text" id="userId-textbox" value="' + data.userId + '" /></td>'));
+							row.append('<td class="action"><ul class="menu"><li></li></ul></td>');
+							jQuery("#roster-table > tbody").append(row);
+						}
+						else {
+							row.children("tr").append('<td colspan="3"><div class="aui-message aui-message-generic"><p class="title">No records</p><p>The username pay not exist, or there is no record set for this username.</p></div></td>');
+							jQuery("#roster-table > tbody").append(row);
+						}
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<form class="aui" id="searchForm" method="post" action="">
+			<fieldset>
+				<legend>Search</legend>
+				<div class="field-group">
+					<label for="username">Username</label>
+					<input class="text medium-field" id="username" />
+				</div>
+				<div class="buttons-container">
+					<div class="buttons">
+						<input class="button submit" type="submit"
+					</div>
+				</div>
+			</fieldset>
+		</form>
+		<table id="roster-table">
+			<thead>
+				<tr>
+					<th id="username-header">Username</th>
+					<th id="weChatId-header">WeChat Account</th>
+					<th id="userId-header">WeChat Enterprise Generated User ID</th>
+					<th id="actions-header">Actions</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</body>
+</html>

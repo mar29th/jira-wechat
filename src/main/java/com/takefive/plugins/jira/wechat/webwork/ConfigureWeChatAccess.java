@@ -1,7 +1,5 @@
 package com.takefive.plugins.jira.wechat.webwork;
 
-import javax.ws.rs.HttpMethod;
-
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;

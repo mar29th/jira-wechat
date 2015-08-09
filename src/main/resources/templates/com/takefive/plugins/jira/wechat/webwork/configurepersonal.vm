@@ -1,0 +1,35 @@
+<html>
+	<head>
+		<title>$action.getText("jira-wechat.personal.configuration.label")</title>
+		$webResourceManager.requireResourcesForContext("jira-wechat-connector")
+	</head>
+	<body>
+		#if ($action.hasAnyErrors())
+		<div class="aui-message aui-message-error">
+		    <p class="title">
+		        <strong>Error!</strong>
+		    </p>
+            #foreach ($error in $action.getErrorMessages())
+	    	<p>${error}</p>
+	        #end
+		</div>
+		#end
+		<form id="configSecret" class="aui" method="post" action="${baseurl}/secure/ConfigureWeChatId.jspa">
+            <div class="field-group">
+                <label for="weChatId">Personal WeChat Account nickname</label>
+                <input type="text" class="text medium-field" id="weChatId" value="$action.getWeChatId()" required />
+                <div class="description">Personal WeChat Account nickname from your profile page</div>
+            </div>
+            <div class="field-group">
+                <label for="userId">Enterprise Account UserID</label>
+                <input type="text" class="text medium-field" id="userId" value="$action.getWeChatUserId()" disabled="disabled" />
+                <div class="description">Generated Enterprise UserID</div>
+            </div>
+            <div class="buttons-container">
+            	<div class="buttons">
+                	<input class="button submit" type="submit" value="Save">
+            	</div>
+            </div>
+        </form>
+	</body>
+</html>

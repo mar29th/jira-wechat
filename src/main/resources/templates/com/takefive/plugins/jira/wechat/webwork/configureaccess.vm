@@ -1,7 +1,7 @@
 <html>
     <head>
-        <title>$action.getText("jira-wechat.configuration.label")</title>
-        <meta name="decorator" content="atl.admin">
+        <title>$action.getText("jira-wechat.configuration.access.label")</title>
+		$webResourceManager.requireResourcesForContext("jira-wechat-connector")
     </head>
     <body>
         <form id="configSecret" class="aui" method="post" action="${baseurl}/secure/admin/ConfigureWeChatAccess.jspa">

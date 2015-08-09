@@ -29,8 +29,7 @@ public class ConfigureUserRoster extends JiraWebActionSupport {
     return SUCCESS;
   }
   
-  public String doRefreshRoster() {
+  public String doExecute() {
     return SUCCESS;
   }
-  
 }
