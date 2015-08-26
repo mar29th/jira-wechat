@@ -5,10 +5,9 @@
 	</head>
 	<body>
 		#if ($action.hasAnyErrors())
+		<div id="aui-message-bar"></div>
 		<div class="aui-message aui-message-error">
-		    <p class="title">
-		        <strong>Error!</strong>
-		    </p>
+		    <p class="title"><strong>Error</strong></p>
             #foreach ($error in $action.getErrorMessages())
 	    	<p>${error}</p>
 	        #end

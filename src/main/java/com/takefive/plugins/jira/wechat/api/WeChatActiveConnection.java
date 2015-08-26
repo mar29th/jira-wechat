@@ -149,12 +149,16 @@ public class WeChatActiveConnection {
     send(url, HttpMethods.POST, member.toJson());
   }
   
-  public void deleteMember(Member member) throws ConnectionException {
+  public void deleteMember(String userId) throws ConnectionException {
     logger.debug("Deleting member");
     
     String token = getAccessToken();
-    String url = URLHelper.getDeleteMemberURL(token, member.getUserId());
+    String url = URLHelper.getDeleteMemberURL(token, userId);
     send(url, HttpMethods.GET, null);
+  }
+  
+  public void deleteMember(Member member) throws ConnectionException {
+    deleteMember(member.getUserId());
   }
   
   public void inviteFollow(Member member) throws ConnectionException {
@@ -168,7 +172,7 @@ public class WeChatActiveConnection {
     } catch (JSONException e) {
       // Should not happen
       e.printStackTrace();
-      throw new ConnectionException("What?!");
+      throw new ConnectionException("Shouldn't happen");
     }
   }
   

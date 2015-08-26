@@ -3,6 +3,51 @@
 		<title>$action.getText("jira-wechat.personal.configuration.roster.label")</title>
 		$webResourceManager.requireResourcesForContext("jira-wechat-connector")
 		<script type="text/javascript">
+			function deleteRow(row) {
+				AJS.$(row).remove();
+			}
+			
+			function updateRowFromButton(button) {
+				var row = button.parentNode.parentNode.parentNode.parentNode;
+				AJS.$.ajax({
+					url: "/rest/wechataccountinfo/1.0/roster/" + row.childNodes[0].data,
+					method: "POST",
+					success: function (data, textStatus, jqXHR) {
+						AJS.messages.success({
+							title: "Updated",
+							body: "<p>Successfully updated information.</p>"
+						});
+					},
+					error: function (data, textStatus, jqXHR) {
+						AJS.messages.error({
+							title: "Error",
+							body: "<p>An error occurred.</p>"
+						});
+					}
+				});
+			}
+			
+			function deleteRowFromButton(button) {
+				var row = button.parentNode.parentNode.parentNode.parentNode;
+				AJS.$.ajax({
+					url: "/rest/wechataccountinfo/1.0/roster/" + row.childNodes[0].data,
+					method: "DELETE",
+					success: function (data, textStatus, jqXHR) {
+						deleteRow(row);
+						AJS.messages.success({
+							title: "Deleted",
+							body: "<p>Successfully deleted information.</p>"
+						});
+					},
+					error: function (data, textStatus, jqXHR) {
+						AJS.messages.error({
+							title: "Error",
+							body: "<p>An error occurred.</p>"
+						});
+					}
+				});
+			}
+			
 			AJS.$("#searchForm").submit(function (e) {
 				e.preventDefault();
 				jQuery.ajax({
@@ -14,11 +59,11 @@
 						var row = jQuery("<tr></tr>");
 						if (data.userId && data.userId !== "")
 							row.append('<td headers="username-header"><input type="text" id="username-textbox" value="' + data.username + '" /></td><td headers="weChatId-header"><input type="text" id="weChatId-textbox" value="' + data.weChatId + '" /></td><td headers="userId-header"><input type="text" id="userId-textbox" value="' + data.userId + '" /></td>'));
-							row.append('<td class="action"><ul class="menu"><li></li></ul></td>');
+							row.append('<td class="action"><ul class="menu"><li><a href="javascript:updateRowFromButton(this);">Update</a></li><li><a href="javascript:deleteRowFromButton(this);">Delete</a></li></ul></td>');
 							jQuery("#roster-table > tbody").append(row);
 						}
 						else {
-							row.children("tr").append('<td colspan="3"><div class="aui-message aui-message-generic"><p class="title">No records</p><p>The username pay not exist, or there is no record set for this username.</p></div></td>');
+							row.children("tr").append('<td colspan="4"><div class="aui-message aui-message-generic"><p class="title">No records</p><p>The username pay not exist, or there is no record set for this username.</p></div></td>');
 							jQuery("#roster-table > tbody").append(row);
 						}
 					}
@@ -27,6 +72,15 @@
 		</script>
 	</head>
 	<body>
+		<div id="aui-message-bar"></div>
+		#if ($action.hasAnyErrors())
+		<div class="aui-message aui-message-error">
+			<p class="title"><strong>Error</strong></p>
+			#foreach ($error in $action.getErrorMessages())
+			<p>${error}</p>
+			#end
+		</div>
+		#end
 		<form class="aui" id="searchForm" method="post" action="">
 			<fieldset>
 				<legend>Search</legend>

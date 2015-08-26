@@ -5,8 +5,8 @@ import com.google.gson.Gson;
 public class Department {
   private String name;
   private int parentid;
-  int order;
-  int id;
+  private int order;
+  private int id;
   
   public Department() {}
   

@@ -15,7 +15,7 @@ import com.atlassian.sal.api.user.UserProfile;
 import com.takefive.plugins.jira.wechat.api.ConnectionException;
 import com.takefive.plugins.jira.wechat.api.WeChatActiveConnection;
 import com.takefive.plugins.jira.wechat.api.template.Member;
-import com.takefive.plugins.jira.wechat.util.SettingsConstants;
+import com.takefive.plugins.jira.wechat.configuration.ConfigurationConstants;
 
 @SuppressWarnings("serial")
 public class ConfigureWeChatId extends JiraWebActionSupport {
@@ -57,32 +57,36 @@ public class ConfigureWeChatId extends JiraWebActionSupport {
       weChatIdMap = new HashMap<String, String>();
     }
     else {
-      weChatIdMap = (Map<String, String>) pluginSettings.get(SettingsConstants.WECHAT_ID);
+      weChatIdMap = (Map<String, String>) pluginSettings.get(ConfigurationConstants.WECHAT_ID);
     }
     if (pluginSettings.get("jira-wechat.user.userid") == null) {
       weChatUserIdMap = new HashMap<String, String>();
     }
     else {
-      weChatUserIdMap = (Map<String, String>) pluginSettings.get(SettingsConstants.USERID);
+      weChatUserIdMap = (Map<String, String>) pluginSettings.get(ConfigurationConstants.USERID);
     }
     
     String userId;
-    if (!weChatUserIdMap.containsKey(username)) {
+    if (!weChatUserIdMap.containsKey(username)) { // Does not exist in the directory
       userId = "jira-" + UUID.randomUUID().toString();
       member.setUserId(userId);
       try {
         activeConnection.addMember(member);
       } catch (ConnectionException e) {
         e.printStackTrace();
+        this.addErrorMessage("Error when synchronizing with WeChat.");
+        return ERROR;
       }
     }
-    else {
+    else { // Already exists
       userId = weChatUserIdMap.get(username);
       member.setUserId(userId);
       try {
         activeConnection.updateMember(member);
       } catch (ConnectionException e) {
         e.printStackTrace();
+        this.addErrorMessage("Error when synchronizing with WeChat.");
+        return ERROR;
       }
     }
     
@@ -97,14 +101,14 @@ public class ConfigureWeChatId extends JiraWebActionSupport {
   
   @SuppressWarnings("unchecked")
   public String getWeChatId() {
-    Map<String, String> weChatIdMap = (Map<String, String>) pluginSettings.get(SettingsConstants.WECHAT_ID);
+    Map<String, String> weChatIdMap = (Map<String, String>) pluginSettings.get(ConfigurationConstants.WECHAT_ID);
     String retval = weChatIdMap.get(userManager.getRemoteUsername());
     return retval == null ? "" : retval;
   }
   
   @SuppressWarnings("unchecked")
   public String getWeChatUserId() {
-    Map<String, String> weChatUserIdMap = (Map<String, String>) pluginSettings.get(SettingsConstants.USERID);
+    Map<String, String> weChatUserIdMap = (Map<String, String>) pluginSettings.get(ConfigurationConstants.USERID);
     String retval = weChatUserIdMap.get(userManager.getRemoteUsername());
     return retval == null ? "" : retval;
   }

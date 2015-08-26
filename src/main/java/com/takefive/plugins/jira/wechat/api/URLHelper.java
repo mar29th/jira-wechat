@@ -37,7 +37,7 @@ public class URLHelper {
     return String.format("https://qyapi.weixin.qq.com/cgi-bin/user/update?access_token=%s", accessToken);
   }
   
-  public static String getDeleteDepaermentURL(String accessToken, int departmentId) {
+  public static String getDeleteDepartmentURL(String accessToken, int departmentId) {
     return String.format("https://qyapi.weixin.qq.com/cgi-bin/department/delete?access_token=%s&id=%s", accessToken, departmentId);
   }
   

@@ -1,39 +1,32 @@
-package com.takefive.plugins.jira.wechat.rest;
+package com.takefive.plugins.jira.wechat.configuration.template;
 
-import javax.xml.bind.annotation.*;
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
-public class WeChatAccountInfoModel {
+import com.google.gson.Gson;
+
+public class UserInfo {
   
-  @XmlElement
   private String username;
-
-  @XmlElement
+  
   private String userId;
   
-  @XmlElement
   private String weChatId;
-
-  public WeChatAccountInfoModel(String username, String userId, String weChatId) {
-    super();
-    this.username = username;
-    this.userId = userId;
-    this.weChatId = weChatId;
-  }
   
+  public UserInfo(String username) {
+    this.username = username;
+  }
+
   public String getUsername() {
     return username;
   }
-  
+
   public void setUsername(String username) {
     this.username = username;
   }
-  
+
   public String getUserId() {
     return userId;
   }
 
-  public void setuserId(String userId) {
+  public void setUserId(String userId) {
     this.userId = userId;
   }
 
@@ -43,5 +36,9 @@ public class WeChatAccountInfoModel {
 
   public void setWeChatId(String weChatId) {
     this.weChatId = weChatId;
+  }
+  
+  public String toJson() {
+    return new Gson().toJson(this);
   }
 }
