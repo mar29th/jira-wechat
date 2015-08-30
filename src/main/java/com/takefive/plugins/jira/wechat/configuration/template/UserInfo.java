@@ -8,7 +8,7 @@ public class UserInfo {
   
   private String userId;
   
-  private String weChatId;
+  private String weChatId = "";
   
   public UserInfo(String username) {
     this.username = username;

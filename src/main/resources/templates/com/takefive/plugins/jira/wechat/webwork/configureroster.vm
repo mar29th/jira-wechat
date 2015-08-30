@@ -86,11 +86,11 @@
 				<legend>Search</legend>
 				<div class="field-group">
 					<label for="username">Username</label>
-					<input class="text medium-field" id="username" />
+					<input class="text medium-field" id="username" name="username" />
 				</div>
 				<div class="buttons-container">
 					<div class="buttons">
-						<input class="button submit" type="submit"
+						<input class="button submit" type="submit" />
 					</div>
 				</div>
 			</fieldset>

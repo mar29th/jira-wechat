@@ -1,21 +1,13 @@
 package com.takefive.plugins.jira.wechat.webwork;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.atlassian.jira.web.action.JiraWebActionSupport;
-import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.atlassian.sal.api.user.UserManager;
-import com.atlassian.sal.api.user.UserProfile;
 import com.takefive.plugins.jira.wechat.api.ConnectionException;
 import com.takefive.plugins.jira.wechat.api.WeChatActiveConnection;
 import com.takefive.plugins.jira.wechat.api.template.Member;
-import com.takefive.plugins.jira.wechat.configuration.ConfigurationConstants;
+import com.takefive.plugins.jira.wechat.configuration.UserInfoAccess;
+import com.takefive.plugins.jira.wechat.configuration.template.UserInfo;
 
 @SuppressWarnings("serial")
 public class ConfigureWeChatId extends JiraWebActionSupport {
@@ -24,20 +16,19 @@ public class ConfigureWeChatId extends JiraWebActionSupport {
   private static final String ERROR = "error";
   
   private final PluginSettingsFactory pluginSettingsFactory;
-  private final PluginSettings pluginSettings;
   private final UserManager userManager;
+  private final UserInfoAccess userInfoAccess;
   
   public ConfigureWeChatId(PluginSettingsFactory pluginSettingsFactory, UserManager userManager) {
     this.pluginSettingsFactory = pluginSettingsFactory;
-    this.pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
     this.userManager = userManager;
+    this.userInfoAccess = new UserInfoAccess(this.pluginSettingsFactory);
   }
   
   public String doDefault() {
     return SUCCESS;
   }
   
-  @SuppressWarnings("unchecked")
   public String doExecute() {
     String weChatId = getHttpRequest().getParameter("weChatId");
     String username = userManager.getRemoteUsername();
@@ -46,41 +37,16 @@ public class ConfigureWeChatId extends JiraWebActionSupport {
       return ERROR;
     }
     
-    Member member = new Member();
-    member.setWeChatId(weChatId);
     WeChatActiveConnection activeConnection = new WeChatActiveConnection(pluginSettingsFactory);
+    UserInfo userInfo = userInfoAccess.getOrCreateUserInfo(username);
+    userInfo.setWeChatId(weChatId);
     
-    // Get storage
-    Map<String, String> weChatIdMap;
-    Map<String, String> weChatUserIdMap;
-    if (pluginSettings.get("jira-wechat.user.wechatid") == null) {
-      weChatIdMap = new HashMap<String, String>();
-    }
-    else {
-      weChatIdMap = (Map<String, String>) pluginSettings.get(ConfigurationConstants.WECHAT_ID);
-    }
-    if (pluginSettings.get("jira-wechat.user.userid") == null) {
-      weChatUserIdMap = new HashMap<String, String>();
-    }
-    else {
-      weChatUserIdMap = (Map<String, String>) pluginSettings.get(ConfigurationConstants.USERID);
-    }
+    // Connect to WeChat server
+    Member member = new Member();
+    member.setUserId(userInfo.getUserId());
+    member.setWeChatId(weChatId);
     
-    String userId;
-    if (!weChatUserIdMap.containsKey(username)) { // Does not exist in the directory
-      userId = "jira-" + UUID.randomUUID().toString();
-      member.setUserId(userId);
-      try {
-        activeConnection.addMember(member);
-      } catch (ConnectionException e) {
-        e.printStackTrace();
-        this.addErrorMessage("Error when synchronizing with WeChat.");
-        return ERROR;
-      }
-    }
-    else { // Already exists
-      userId = weChatUserIdMap.get(username);
-      member.setUserId(userId);
+    if (userInfoAccess.hasUserInfo(username)) {
       try {
         activeConnection.updateMember(member);
       } catch (ConnectionException e) {
@@ -89,27 +55,29 @@ public class ConfigureWeChatId extends JiraWebActionSupport {
         return ERROR;
       }
     }
+    else {
+      try {
+        activeConnection.addMember(member);
+      } catch (ConnectionException e) {
+        e.printStackTrace();
+        this.addErrorMessage("Error when synchronizing with WeChat.");
+        return ERROR;
+      }
+    }
     
-    // Store info
-    weChatIdMap.put(username, weChatId);
-    weChatUserIdMap.put(username, userId);
-    pluginSettings.put("jira-wechat.user.wechatid", weChatIdMap);
-    pluginSettings.put("jira-wechat.user.userid", weChatUserIdMap);
+    // Set updated
+    userInfoAccess.setUserInfo(username, userInfo);
     
     return SUCCESS;
   }
   
-  @SuppressWarnings("unchecked")
   public String getWeChatId() {
-    Map<String, String> weChatIdMap = (Map<String, String>) pluginSettings.get(ConfigurationConstants.WECHAT_ID);
-    String retval = weChatIdMap.get(userManager.getRemoteUsername());
+    String retval = userInfoAccess.getUserInfo(userManager.getRemoteUsername()).getUsername();
     return retval == null ? "" : retval;
   }
   
-  @SuppressWarnings("unchecked")
   public String getWeChatUserId() {
-    Map<String, String> weChatUserIdMap = (Map<String, String>) pluginSettings.get(ConfigurationConstants.USERID);
-    String retval = weChatUserIdMap.get(userManager.getRemoteUsername());
+    String retval = userInfoAccess.getUserInfo(userManager.getRemoteUsername()).getWeChatId();
     return retval == null ? "" : retval;
   }
 }

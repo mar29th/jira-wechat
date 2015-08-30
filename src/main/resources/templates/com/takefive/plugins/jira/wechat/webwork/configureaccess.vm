@@ -6,14 +6,19 @@
     <body>
         <form id="configSecret" class="aui" method="post" action="${baseurl}/secure/admin/ConfigureWeChatAccess.jspa">
             <div class="field-group">
-                <label for="corpId">CorpId</label>
-                <input type="text" class="text medium-field" id="corpId" name="$action.getCorpId()">
+                <label for="corpId">Access ID</label>
+                <input type="text" class="text medium-field" id="corpId" name="corpId" value="$action.getCorpId()" />
                 <div class="description">WeChat CorpId obtained from <a href="http://qy.weixin.qq.com">WeChat Enterprise Account Management Console</a></div>
             </div>
             <div class="field-group">
-                <label for="corpSecret">CorpSecret</label>
-                <input type="text" class="text medium-field" id="corpSecert" name="$action.getCorpSecret()">
+                <label for="corpSecret">Access Secret</label>
+                <input type="text" class="text medium-field" id="corpSecert" name="corpSecret" value="$action.getCorpSecret()" />
                 <div class="description">WeChat CorpSecret obtained from <a href="http://qy.weixin.qq.com">WeChat Enterprise Account Management Console</a></div>
+            </div>
+            <div class="field-group">
+            	<label for="agentId">Agent ID</label>
+            	<input type="text" class="text medium-field" id="agentId" name="agentId" value="$action.getAgentId()" />
+            	<div class="description">Application ID shown in Enterprise Account Console</div>
             </div>
             <div class="buttons-container">
             	<div class="buttons">

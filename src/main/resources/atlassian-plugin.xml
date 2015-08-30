@@ -10,11 +10,10 @@
     <param name="plugin-logo">images/pluginLogo.png</param>
   </plugin-info>
   <!-- I18n -->
-  <resource type="i18n" name="i18n" location="i18n.properties"/>
+  <resource type="i18n" name="locale" location="i18n/properties"/>
   <!-- Web resources -->
   <web-resource key="jira-wechat-connector-resources" name="jira-wechat-connector Web Resources">
     <dependency>com.atlassian.auiplugin:ajs</dependency>
-    <dependency>com.atlassian.auiplugin:aui-experimental-restfultable</dependency>
     <resource type="download" name="jira-wechat-connector.css" location="/css/jira-wechat-connector.css"/>
     <resource type="download" name="jira-wechat-connector.js" location="/js/jira-wechat-connector.js"/>
     <resource type="download" name="images/" location="/images"/>

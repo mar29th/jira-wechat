@@ -21,8 +21,8 @@ public class Member {
     return userid;
   }
   
-  public void setUserId(String userid) {
-    this.userid = userid;
+  public void setUserId(String userId) {
+    this.userid = userId;
   }
   
   public String getName() {
@@ -89,16 +89,16 @@ public class Member {
     return weixinid;
   }
   
-  public void setWeChatId(String weixinid) {
-    this.weixinid = weixinid;
+  public void setWeChatId(String weChatId) {
+    this.weixinid = weChatId;
   }
   
   public String getAvatarMediaId() {
     return avatar_mediaid;
   }
   
-  public void setAvatarMediaId(String avatar_mediaid) {
-    this.avatar_mediaid = avatar_mediaid;
+  public void setAvatarMediaId(String mediaId) {
+    this.avatar_mediaid = mediaId;
   }
   
   

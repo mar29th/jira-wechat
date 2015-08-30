@@ -9,10 +9,17 @@ import com.atlassian.event.api.EventListener;
 import com.atlassian.event.api.EventPublisher;
 import com.atlassian.jira.event.issue.IssueEvent;
 import com.atlassian.jira.event.type.EventType;
+import com.atlassian.jira.issue.Issue;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.atlassian.sal.api.user.UserManager;
+import com.takefive.plugins.jira.wechat.api.ConnectionException;
 import com.takefive.plugins.jira.wechat.api.WeChatActiveConnection;
+import com.takefive.plugins.jira.wechat.api.template.Article;
+import com.takefive.plugins.jira.wechat.api.template.NewsMessage;
+import com.takefive.plugins.jira.wechat.configuration.UserInfoAccess;
+import com.takefive.plugins.jira.wechat.configuration.template.UserInfo;
+import com.takefive.plugins.jira.wechat.util.URLAssembler;
 
 public class IssueCreatedUpdatedListener implements InitializingBean, DisposableBean {
   
@@ -21,25 +28,57 @@ public class IssueCreatedUpdatedListener implements InitializingBean, Disposable
   private final EventPublisher eventPublisher;
   private final PluginSettingsFactory pluginSettingsFactory;
   private final UserManager userManager;
+  private final I18nResolver i18nResolver;
+  private final WeChatActiveConnection activeConnection;
+  private final UserInfoAccess userInfoAccess;
   
-  private WeChatActiveConnection activeConnection;
+  private final String username;
   
-  public IssueCreatedUpdatedListener(EventPublisher eventPublisher, PluginSettingsFactory pluginSettingsFactory, UserManager userManager) {
+  public IssueCreatedUpdatedListener(EventPublisher eventPublisher,
+      PluginSettingsFactory pluginSettingsFactory, UserManager userManager, I18nResolver i18nResolver) {
     this.eventPublisher = eventPublisher;
     this.pluginSettingsFactory = pluginSettingsFactory;
     this.userManager = userManager;
-    activeConnection = new WeChatActiveConnection(this.pluginSettingsFactory);
+    this.i18nResolver = i18nResolver;
+    this.activeConnection = new WeChatActiveConnection(this.pluginSettingsFactory);
+    this.username = this.userManager.getRemoteUsername();
+    this.userInfoAccess = new UserInfoAccess(this.pluginSettingsFactory);
   }
   
   @EventListener
-  public void onIssueCreatedUpdated(IssueEvent event) {
+  public void onIssueEvent(IssueEvent event) {
+    logger.debug("Issue event called");
     long eventTypeId = event.getEventTypeId();
-    if (eventTypeId == EventType.ISSUE_CREATED_ID)
-      onIssueCreated(event);
-    else if (eventTypeId == EventType.ISSUE_UPDATED_ID)
-      onIssueUpdated(event);
-    else if (eventTypeId == EventType.ISSUE_CLOSED_ID)
-      onIssueClosed(event);
+    String title = "";
+    String description = "";
+    if (eventTypeId == EventType.ISSUE_CREATED_ID) {
+      logger.debug("Issue created");
+      title = i18nResolver.getText("issue-created.title");
+      description = i18nResolver.getText("issue-created.description");
+    }
+    else if (eventTypeId == EventType.ISSUE_UPDATED_ID) {
+      logger.debug("Issue updated");
+      title = i18nResolver.getText("issue-updated.title");
+      description = i18nResolver.getText("issue-updated.description");
+    }
+    else if (eventTypeId == EventType.ISSUE_CLOSED_ID) {
+      logger.debug("Issue closed");
+      title = i18nResolver.getText("issue-closed.title");
+      description = i18nResolver.getText("issue-closed.description");
+    }
+    Issue issue = event.getIssue();
+    NewsMessage message = new NewsMessage();
+    message.addArticle(new Article(title,
+                                   description,
+                                   URLAssembler.toIssueURL(issue.getKey())));
+    UserInfo userInfo = userInfoAccess.getUserInfo(username);
+    message.addRecipient(userInfo.getUserId());
+    try {
+      activeConnection.sendMessage(message);
+    } catch (ConnectionException e) {
+      logger.error("Connection error: " + e.getMessage());
+      e.printStackTrace();
+    }
   }
 
   @Override
@@ -50,18 +89,5 @@ public class IssueCreatedUpdatedListener implements InitializingBean, Disposable
   @Override
   public void destroy() throws Exception {
     eventPublisher.unregister(this);
-  }
-  
-  private void onIssueCreated(IssueEvent event) {
-    logger.debug("Issue created");
-    
-  }
-  
-  private void onIssueUpdated(IssueEvent event) {
-    logger.debug("Issue updated");
-  }
-  
-  private void onIssueClosed(IssueEvent event) {
-    logger.debug("Issue closed");
   }
 }

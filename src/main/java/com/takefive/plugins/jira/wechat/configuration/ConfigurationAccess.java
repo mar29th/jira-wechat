@@ -16,21 +16,29 @@ public class ConfigurationAccess {
     this.pluginSettings = this.pluginSettingsFactory.createGlobalSettings();
   }
   
+  public boolean hasKey(String key) {
+    return pluginSettings.get(key) != null;
+  }
+  
+  public String getString(String key) {
+    return (String) pluginSettings.get(key);
+  }
+  
   @SuppressWarnings("unchecked")
-  protected Map<String, String> getMap(String type) {
+  public Map<String, String> getMap(String key) {
     Map<String, String> retval;
-    if (pluginSettings.get(type) == null) {
+    if (!hasKey(key)) {
       retval = new HashMap<String, String>();
-      pluginSettings.put(type, retval);
+      pluginSettings.put(key, retval);
     }
     else {
-      retval = (Map<String, String>) pluginSettings.get(type);
+      retval = (Map<String, String>) pluginSettings.get(key);
     }
     
     return retval;
   }
   
-  protected void setMap(String type, Map<String, String> map) {
+  public void setMap(String type, Map<String, String> map) {
     pluginSettings.put(type, map);
   }
 }

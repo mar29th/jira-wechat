@@ -16,12 +16,12 @@
 		<form id="configSecret" class="aui" method="post" action="${baseurl}/secure/ConfigureWeChatId.jspa">
             <div class="field-group">
                 <label for="weChatId">Personal WeChat Account nickname</label>
-                <input type="text" class="text medium-field" id="weChatId" value="$action.getWeChatId()" required />
+                <input type="text" class="text medium-field" id="weChatId" name="weChatId" value="$action.getWeChatId()" required />
                 <div class="description">Personal WeChat Account nickname from your profile page</div>
             </div>
             <div class="field-group">
                 <label for="userId">Enterprise Account UserID</label>
-                <input type="text" class="text medium-field" id="userId" value="$action.getWeChatUserId()" disabled="disabled" />
+                <input type="text" class="text medium-field" id="userId" name="userId" value="$action.getWeChatUserId()" disabled="disabled" />
                 <div class="description">Generated Enterprise UserID</div>
             </div>
             <div class="buttons-container">

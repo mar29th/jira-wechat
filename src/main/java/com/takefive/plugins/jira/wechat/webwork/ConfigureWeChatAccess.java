@@ -3,6 +3,7 @@ package com.takefive.plugins.jira.wechat.webwork;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
+import com.takefive.plugins.jira.wechat.configuration.ConfigurationConstants;
 
 @SuppressWarnings("serial")
 public class ConfigureWeChatAccess extends JiraWebActionSupport {
@@ -24,17 +25,23 @@ public class ConfigureWeChatAccess extends JiraWebActionSupport {
   public String doExecute() {
     String corpId = getHttpRequest().getParameter("corpId");
     String corpSecret = getHttpRequest().getParameter("corpSecret");
-    pluginSettings.put("jira-wechat.corpId", corpId);
-    pluginSettings.put("jira-wechat.corpSecret", corpSecret);
+    String agentId = getHttpRequest().getParameter("agentId");
+    pluginSettings.put(ConfigurationConstants.CORP_ID, corpId);
+    pluginSettings.put(ConfigurationConstants.CORP_SECRET, corpSecret);
+    pluginSettings.put(ConfigurationConstants.AGENT_ID, agentId);
     
     return SUCCESS;
   }
   
   public String getCorpId() {
-    return (String) pluginSettings.get("jira-wechat.corpId");
+    return (String) pluginSettings.get(ConfigurationConstants.CORP_ID);
   }
   
   public String getCropSecret() {
-    return (String) pluginSettings.get("jira-wechat.corpSecret");
+    return (String) pluginSettings.get(ConfigurationConstants.CORP_SECRET);
+  }
+  
+  public String getAgentId() {
+    return (String) pluginSettings.get(ConfigurationConstants.AGENT_ID);
   }
 }

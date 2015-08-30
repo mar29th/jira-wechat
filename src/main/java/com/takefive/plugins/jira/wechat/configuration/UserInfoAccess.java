@@ -1,9 +1,8 @@
 package com.takefive.plugins.jira.wechat.configuration;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
-import com.atlassian.sal.api.pluginsettings.PluginSettings;
 import com.atlassian.sal.api.pluginsettings.PluginSettingsFactory;
 import com.google.gson.Gson;
 import com.takefive.plugins.jira.wechat.configuration.template.UserInfo;
@@ -31,6 +30,7 @@ public class UserInfoAccess extends ConfigurationAccess {
     UserInfo retval;
     if (hasUserInfo(username)) {
       retval = new UserInfo(username);
+      retval.setUserId(UUID.randomUUID().toString());
     }
     else {
       return new Gson().fromJson(getMap(ConfigurationConstants.USERINFO).get(username), UserInfo.class);

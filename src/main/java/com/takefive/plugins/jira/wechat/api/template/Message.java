@@ -3,34 +3,33 @@ package com.takefive.plugins.jira.wechat.api.template;
 import java.util.ArrayList;
 
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import com.atlassian.jira.util.json.JSONException;
-import com.atlassian.jira.util.json.JSONObject;
-
-public abstract class AbstractMessage {
+public abstract class Message implements JsonSerializable {
   
   public static final String DELIMITER = "|";
   
-  private ArrayList<String> toUser;
-  private ArrayList<String> toParty;
-  private ArrayList<String> toTag;
+  protected ArrayList<String> toUser;
+  protected ArrayList<String> toParty;
+  protected ArrayList<String> toTag;
 
-  private String msgType;
-  private int agentId;
-  private int safe;
+  protected String msgType;
+  protected int agentId;
+  protected int safe;
   
-  public AbstractMessage() {
+  public Message() {
     toUser = new ArrayList<String>();
     toParty = new ArrayList<String>();
     toTag = new ArrayList<String>();
   }
   
-  public void addUser(String userId) {
+  public void addRecipient(String userId) {
     if (!toUser.contains(userId))
       toUser.add(userId);
   }
   
-  public void deleteUser(String userId) {
+  public void deleteRecipient(String userId) {
     toUser.remove(userId);
   }
   
@@ -79,7 +78,7 @@ public abstract class AbstractMessage {
       safe = 0;
   }
   
-  protected JSONObject toJsonObject() {
+  public JSONObject toJsonObject() {
     String toUserStr = StringUtils.join(toUser, DELIMITER);
     String toPartyStr = StringUtils.join(toParty, DELIMITER);
     String toTagStr = StringUtils.join(toTag, DELIMITER);

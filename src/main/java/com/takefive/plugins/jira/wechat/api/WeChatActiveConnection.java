@@ -8,8 +8,10 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
 import com.ning.http.client.Response;
 import com.takefive.plugins.jira.wechat.api.template.Department;
+import com.takefive.plugins.jira.wechat.api.template.JsonSerializable;
 import com.takefive.plugins.jira.wechat.api.template.Member;
-import com.takefive.plugins.jira.wechat.api.template.TextMessage;
+import com.takefive.plugins.jira.wechat.configuration.ConfigurationAccess;
+import com.takefive.plugins.jira.wechat.configuration.ConfigurationConstants;
 import com.takefive.plugins.jira.wechat.util.DateUtils;
 
 import java.io.IOException;
@@ -29,9 +31,10 @@ public class WeChatActiveConnection {
   
   private static final Logger logger = LoggerFactory.getLogger(WeChatActiveConnection.class);
 
-  private AsyncHttpClient client;
+  private final AsyncHttpClient client;
   private final PluginSettingsFactory pluginSettingsFactory;
   private PluginSettings pluginSettings;
+  private ConfigurationAccess config;
   
   private String corpId;
   private String corpSecret;
@@ -91,8 +94,8 @@ public class WeChatActiveConnection {
     logger.debug("Retrieving token");
     
     // Check if token exists already and is within expiration.
-    String settingsAccessToken = (String) pluginSettings.get("jira-wechat.accessToken");
-    int settingsExpiresIn = (Integer) pluginSettings.get("jira-wechat.tokenExpiresIn");
+    String settingsAccessToken = config.getString(ConfigurationConstants.ACCESS_TOKEN);
+    int settingsExpiresIn = (Integer) pluginSettings.get(ConfigurationConstants.TOKEN_EXPIRATION);
     if (settingsAccessToken != null && settingsExpiresIn > DateUtils.getUnixTime()) {
       return settingsAccessToken;
     }
@@ -125,7 +128,7 @@ public class WeChatActiveConnection {
     }
   }
   
-  public void sendTextMessage(TextMessage message) throws ConnectionException {
+  public void sendMessage(JsonSerializable message) throws ConnectionException {
     logger.debug("Sending message");
     
     String token = getAccessToken();
