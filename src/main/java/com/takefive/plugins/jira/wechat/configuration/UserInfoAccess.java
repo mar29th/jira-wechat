@@ -28,7 +28,7 @@ public class UserInfoAccess extends ConfigurationAccess {
   
   public UserInfo getOrCreateUserInfo(String username) {
     UserInfo retval;
-    if (hasUserInfo(username)) {
+    if (!hasUserInfo(username)) {
       retval = new UserInfo(username);
       retval.setUserId(UUID.randomUUID().toString());
     }

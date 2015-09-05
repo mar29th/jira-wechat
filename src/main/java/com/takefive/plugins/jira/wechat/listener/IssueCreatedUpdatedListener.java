@@ -1,7 +1,6 @@
 package com.takefive.plugins.jira.wechat.listener;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -23,7 +22,7 @@ import com.takefive.plugins.jira.wechat.util.URLAssembler;
 
 public class IssueCreatedUpdatedListener implements InitializingBean, DisposableBean {
   
-  private final Logger logger = LoggerFactory.getLogger(IssueCreatedUpdatedListener.class);
+  private final Logger logger = Logger.getLogger(IssueCreatedUpdatedListener.class);
   
   private final EventPublisher eventPublisher;
   private final PluginSettingsFactory pluginSettingsFactory;
@@ -48,6 +47,14 @@ public class IssueCreatedUpdatedListener implements InitializingBean, Disposable
   @EventListener
   public void onIssueEvent(IssueEvent event) {
     logger.debug("Issue event called");
+    
+    /* Check whether WeChat ID is set.
+     * If yes, continue.
+     * If not, return.
+     */
+    if (!userInfoAccess.hasUserInfo(username))
+      return;
+    
     long eventTypeId = event.getEventTypeId();
     String title = "";
     String description = "";

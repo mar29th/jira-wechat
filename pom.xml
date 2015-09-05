@@ -12,6 +12,13 @@
     <name>jira-wechat-connector</name>
     <description>JIRA bridging with WeChat</description>
     <packaging>atlassian-plugin</packaging>
+    <repositories>
+		<repository>
+    		<id>mvncentral</id>
+    		<name>Maven Central</name>
+    		<url>http://repo1.maven.org/</url>
+		</repository>
+	</repositories>
     <dependencies>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
@@ -70,7 +77,7 @@
         <dependency>
             <groupId>com.ning</groupId>
             <artifactId>async-http-client</artifactId>
-            <version>1.9.29</version>
+            <version>1.9.31</version>
         </dependency>
         <!-- Apache Commons Codec -->
         <dependency>
@@ -86,17 +93,21 @@
             <scope>provided</scope>
         </dependency>
         <!-- Logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.6.6</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j13</artifactId>
-            <version>1.0.1</version>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+		  	<artifactId>log4j-api</artifactId>
+		  	<version>2.3</version>
+		</dependency>
+		<dependency>
+		  	<groupId>org.apache.logging.log4j</groupId>
+		  	<artifactId>log4j-core</artifactId>
+		  	<version>2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>2.3</version>
+		</dependency>
         <!-- Miscellaneous -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -116,16 +127,18 @@
             <version>4.1.1</version>
             <scope>test</scope>
         </dependency>
-        <!-- Uncomment to use TestKit in your project. Details at https://bitbucket.org/atlassian/jira-testkit -->
-        <!-- You can read more about TestKit at https://developer.atlassian.com/display/JIRADEV/Plugin+Tutorial+-+Smarter+integration+testing+with+TestKit -->
-        <!--
-		<dependency>
-			<groupId>com.atlassian.jira.tests</groupId>
-			<artifactId>jira-testkit-client</artifactId>
-			<version>${testkit.version}</version>
-			<scope>test</scope>
-		</dependency>
-		-->
+        <dependency>
+            <groupId>com.atlassian.jira.tests</groupId>
+            <artifactId>jira-testkit-client</artifactId>
+            <version>${testkit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.jira.tests</groupId>
+            <artifactId>jira-func-test-basics</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>com.atlassian.plugins.rest</groupId>
             <artifactId>atlassian-rest-common</artifactId>
@@ -155,16 +168,13 @@
                 <configuration>
                     <productVersion>${jira.version}</productVersion>
                     <productDataVersion>${jira.version}</productDataVersion>
-                    <!-- Uncomment to install TestKit backdoor in JIRA. -->
-                    <!--
-					<pluginArtifacts>
-						<pluginArtifact>
-							<groupId>com.atlassian.jira.tests</groupId>
-							<artifactId>jira-testkit-plugin</artifactId>
-							<version>${testkit.version}</version>
-						</pluginArtifact>
-					</pluginArtifacts>
-					-->
+                    <pluginArtifacts>
+                        <pluginArtifact>
+                            <groupId>com.atlassian.jira.tests</groupId>
+                            <artifactId>jira-testkit-plugin</artifactId>
+                            <version>${testkit.version}</version>
+                        </pluginArtifact>
+                    </pluginArtifacts>
                 </configuration>
             </plugin>
             <plugin>
@@ -178,9 +188,9 @@
     </build>
     <properties>
         <jira.version>6.4.7</jira.version>
-        <amps.version>5.0.13</amps.version>
+        <amps.version>5.1.11</amps.version>
         <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
         <!-- TestKit version 5.x for JIRA 5.x, 6.x for JIRA 6.x -->
-        <testkit.version>5.2.26</testkit.version>
+        <testkit.version>6.0.26</testkit.version>
     </properties>
 </project>

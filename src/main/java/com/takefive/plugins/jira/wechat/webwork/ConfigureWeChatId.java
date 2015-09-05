@@ -72,12 +72,14 @@ public class ConfigureWeChatId extends JiraWebActionSupport {
   }
   
   public String getWeChatId() {
-    String retval = userInfoAccess.getUserInfo(userManager.getRemoteUsername()).getUsername();
-    return retval == null ? "" : retval;
+    if (!userInfoAccess.hasUserInfo(userManager.getRemoteUsername()))
+      return "";
+    return userInfoAccess.getUserInfo(userManager.getRemoteUsername()).getWeChatId();
   }
   
   public String getWeChatUserId() {
-    String retval = userInfoAccess.getUserInfo(userManager.getRemoteUsername()).getWeChatId();
-    return retval == null ? "" : retval;
+    if (!userInfoAccess.hasUserInfo(userManager.getRemoteUsername()))
+      return "";
+    return userInfoAccess.getUserInfo(userManager.getRemoteUsername()).getUserId();
   }
 }

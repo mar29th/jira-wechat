@@ -53,7 +53,7 @@
     <description>Set WeChat Enterprise Account Access Information</description>
     <label>Set WeChat Enterprise Account Access Information</label>
     <name>JIRA WeChat Name Item</name>
-    <link>/secure/admin/ConfigureWeChatAccess!default.jspa</link>
+    <link>/secure/ConfigureWeChatAccess!default.jspa</link>
     <condition class="com.atlassian.jira.plugin.webfragment.conditions.JiraGlobalPermissionCondition">
       <param name="permission">admin</param>
     </condition>
@@ -69,7 +69,7 @@
     <description>Set WeChat ID link</description>
     <label>Set WeChat ID link</label>
     <name>JIRA WeChat ID Item</name>
-    <link>/secure/ConfigureWeChatID!default.jspa</link>
+    <link>/secure/ConfigureWeChatId!default.jspa</link>
   </web-item>
   <!-- REST Resource -->
   <rest name="WeChat Account Info" i18n-name-key="wechat-account-info.name" key="we-chat-account-info" path="/wechataccountinfo" version="1.0">

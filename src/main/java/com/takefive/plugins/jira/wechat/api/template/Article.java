@@ -11,6 +11,13 @@ public class Article {
     
   }
   
+  public Article(String title, String description) {
+    this.title = title;
+    this.description = description;
+    this.url = "";
+    this.picurl = "";
+  }
+  
   public Article(String title, String description, String url) {
     this.title = title;
     this.description = description;
